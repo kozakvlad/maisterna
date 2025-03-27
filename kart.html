@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Майстерня Сну</title>
+    <!-- Tailwind CSS через CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#8B7355',
+                        secondary: '#A0522D',
+                        background: '#F5F0E1',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+        
+        /* Додаткові стилі для мобільних пристроїв */
+        @media (max-width: 768px) {
+            html, body {
+                font-size: 16px;
+                overflow-x: hidden;
+            }
+            
+            .container {
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+        }
+        
+        .cart-item {
+            display: flex;
+            margin-bottom: 20px;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item-image {
+            width: 80px;
+            margin-right: 15px;
+        }
+        
+        .cart-item-image img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        .cart-item-details {
+            flex-grow: 1;
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            background-color: #f8f8f8;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 0 5px;
+        }
+        
+        .item-quantity {
+            margin: 0 10px;
+            min-width: 20px;
+            text-align: center;
+        }
+        
+        .remove-btn {
+            margin-left: 15px;
+            padding: 5px 10px;
+            background-color: #8C7A61; /* Колір як у кнопки "Оформити замовлення" */
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .remove-btn:hover {
+            background-color: #6e614c;
+        }
+        
+        #clear-cart {
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+        
+        #clear-cart:hover {
+            background-color: #e0e0e0;
+        }
+        
+        #cart-total {
+            font-weight: bold;
+            font-size: 18px;
+            color: #8C7A61;
+        }
+    </style>
+</head>
+<body class="bg-background font-['Montserrat'] text-black m-0 min-h-screen flex flex-col transition-all duration-300">
+    <header class="bg-primary text-white p-4 shadow-md">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Майстерня Сну</h1>
+            
+            <!-- Мобільне меню (бургер) -->
+            <div class="md:hidden flex items-center">
+                <a href="auth.html" id="auth-link-top-mobile" class="text-white mr-4">
+                    <span class="inline-flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </span>
+                </a>
+                
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <!-- Десктопне меню -->
+            <nav class="hidden md:flex items-center">
+                <ul class="flex space-x-6">
+                    <li><a href="index.html" class="text-white hover:text-background transition-colors">Головна</a></li>
+                    <li><a href="catalog.html" class="text-white hover:text-background transition-colors">Каталог</a></li>
+                    <li><a href="contacts.html" class="text-white hover:text-background transition-colors">Контакти</a></li>
+                    <li>
+                        <a href="kart.html" class="relative text-white hover:text-background transition-colors font-medium">
+                            Кошик
+                            <span id="cart-counter" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </a>
+                    </li>
+                </ul>
+                
+                <div id="auth-link" class="ml-6">
+                    <a href="auth.html" class="text-white hover:text-background transition-colors font-medium flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </a>
+                </div>
+            </nav>
+        </div>
+        
+        <!-- Мобільне меню (випадаюче) -->
+        <div id="mobile-menu" class="hidden md:hidden mt-4 container mx-auto">
+            <ul class="flex flex-col space-y-3 bg-primary p-4 rounded-lg">
+                <li><a href="index.html" class="block text-white hover:text-background transition-colors text-lg">Головна</a></li>
+                <li><a href="catalog.html" class="block text-white hover:text-background transition-colors text-lg">Каталог</a></li>
+                <li><a href="contacts.html" class="block text-white hover:text-background transition-colors text-lg">Контакти</a></li>
+                <li>
+                    <a href="kart.html" class="relative block text-white hover:text-background transition-colors font-medium text-lg">
+                        Кошик
+                        <span id="mobile-cart-counter" class="inline-flex ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 items-center justify-center">0</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto p-6">
+        <h2 class="text-3xl font-bold mb-8 text-primary text-center">Кошик</h2>
+        
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- Порожній кошик -->
+            <div id="cart-empty" class="text-center py-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <h3 class="text-xl font-semibold text-gray-500 mb-2">Ваш кошик порожній</h3>
+                <p class="text-gray-500 mb-6">Перейдіть до каталогу, щоб додати товари</p>
+                <a href="catalog.html" class="bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-md transition-colors duration-300">Перейти до каталогу</a>
+            </div>
+            
+            <!-- Товари в кошику -->
+            <div id="cart-items" class="divide-y divide-gray-200">
+                <!-- Товари будуть додані за допомогою JavaScript -->
+            </div>
+            
+            <!-- Загальна сума -->
+            <div id="cart-total" class="mt-6 pt-6 border-t border-gray-200 hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-lg font-semibold">Загальна сума:</span>
+                    <span id="total-price" class="text-xl font-bold text-primary">0 грн</span>
+                </div>
+                <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                    <button id="clear-cart" class="md:w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition-colors duration-300">Очистити кошик</button>
+                    <button id="checkout" class="md:w-1/2 bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-md transition-colors duration-300">Оформити замовлення</button>
+                </div>
+            </div>
+            
+            <!-- Форма оформлення замовлення -->
+            <div id="checkout-form" class="mt-8 border-t border-gray-200 pt-6 hidden">
+                <h3 class="text-xl font-bold mb-4 text-primary">Оформлення замовлення</h3>
+                
+                <form id="order-form" class="space-y-6">
+                    <!-- Контактні дані -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-primary">Контактні дані</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Ваше ім'я*</label>
+                                <input type="text" id="name" name="name" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Телефон*</label>
+                                <input type="tel" id="phone" name="phone" required 
+                                       pattern="^(\+380|0)\d{9}$" 
+                                       placeholder="+380XXXXXXXXX або 0XXXXXXXXX" 
+                                       title="Введіть український номер телефону у форматі +380XXXXXXXXX або 0XXXXXXXXX" 
+                                       class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                            <div>
+                                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Доставка -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-primary">Доставка</h4>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="delivery-method" class="block text-sm font-medium text-gray-700 mb-1">Спосіб доставки*</label>
+                                <select id="delivery-method" name="delivery_method" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">Виберіть спосіб доставки</option>
+                                    <option value="nova_poshta">Нова Пошта</option>
+                                    <option value="ukr_poshta">Укрпошта</option>
+                                </select>
+                            </div>
+                            
+                            <div id="delivery-address-block">
+                                <label for="delivery-address" class="block text-sm font-medium text-gray-700 mb-1">Адреса доставки*</label>
+                                <textarea id="delivery-address" name="delivery_address" rows="3" required class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Оплата -->
+                    <div>
+                        <h4 class="text-lg font-semibold mb-3 text-primary">Оплата</h4>
+                        <div class="space-y-2">
+                            <div class="flex items-center">
+                                <input type="radio" id="payment-cash" name="payment_method" value="cash" checked class="h-4 w-4 text-primary focus:ring-primary">
+                                <label for="payment-cash" class="ml-2 text-gray-700">Накладений платіж</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="radio" id="payment-card" name="payment_method" value="card" class="h-4 w-4 text-primary focus:ring-primary">
+                                <label for="payment-card" class="ml-2 text-gray-700">Передоплата на картку</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Коментар -->
+                    <div>
+                        <label for="comment" class="block text-sm font-medium text-gray-700 mb-1">Коментар до замовлення</label>
+                        <textarea id="comment" name="comment" rows="3" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"></textarea>
+                    </div>
+                    
+                    <!-- Кнопки -->
+                    <div class="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+                        <button type="button" id="back-to-cart" class="md:w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md transition-colors duration-300">Повернутися до кошика</button>
+                        <button type="submit" class="md:w-1/2 bg-primary hover:bg-secondary text-white font-medium py-2 px-4 rounded-md transition-colors duration-300">Підтвердити замовлення</button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Повідомлення про успішне оформлення замовлення -->
+            <div id="order-success" class="mt-6 text-center py-10 hidden">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-20 w-20 mx-auto text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">Ваше замовлення успішно оформлено!</h3>
+                <p class="text-gray-600 mb-6">Ми зв'яжемося з вами найближчим часом для підтвердження.</p>
+                <p class="text-gray-600 mb-6">Номер вашого замовлення: <span id="order-number" class="font-bold"></span></p>
+                <a href="index.html" class="bg-primary hover:bg-secondary text-white font-medium py-2 px-6 rounded-md transition-colors duration-300 inline-block">Повернутися на головну</a>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-primary text-white p-6 mt-auto">
+        <div class="container mx-auto">
+            <div class="flex flex-col md:flex-row justify-between">
+                <div class="mb-6 md:mb-0">
+                    <h3 class="text-xl font-bold mb-3">Майстерня Сну</h3>
+                    <p>Якісний текстиль для вашого дому</p>
+                </div>
+                <div class="mb-6 md:mb-0">
+                    <h3 class="text-lg font-semibold mb-3">Контакти</h3>
+                    <p>Телефон: +380 50 123 4567</p>
+                    <p>Email: info@maisterniasnu.ua</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-3">Слідкуйте за нами</h3>
+                    <div class="flex flex-col space-y-2">
+                        <div class="flex space-x-4">
+                            <a href="https://www.facebook.com/share/1C3oUKfDRa/?mibextid=wwXIfr" class="text-white hover:text-background transition-colors">Facebook</a>
+                            <a href="https://www.instagram.com/viktoriakozak?igsh=bGczOGZteTV0ajBz&utm_source=qr" class="text-white hover:text-background transition-colors">Instagram</a>
+                            <a href="https://t.me/vykusia" class="text-white hover:text-background transition-colors">Telegram</a>
+                        </div>
+                        <div class="flex space-x-4">
+                            <a href="viber://chat?number=%2B380678602507" class="text-white hover:text-background transition-colors">Viber</a>
+                            <a href="https://www.tiktok.com/@maysterniasnu?_t=ZM-8ujozvI7fAV&_r=1" class="text-white hover:text-background transition-colors">TikTok</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 pt-6 border-t border-white/30 text-center">
+                <p>&copy; 2023 Майстерня Сну. Всі права захищені.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Простий скрипт для кошика
+            
+            // Функція отримання кошика
+            function getCart() {
+                try {
+                    const cartData = localStorage.getItem('cart');
+                    if (cartData) {
+                        const cart = JSON.parse(cartData);
+                        return Array.isArray(cart) ? cart : [];
+                    }
+                } catch (e) {
+                    console.error('Помилка читання кошика:', e);
+                }
+                return [];
+            }
+            
+            // Функція збереження кошика
+            function saveCart(cart) {
+                try {
+                    // Зберігаємо під основним ключем
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    console.log('Кошик збережено, кількість товарів:', cart.length);
+                } catch (e) {
+                    console.error('Помилка збереження кошика:', e);
+                }
+            }
+            
+            // Функція відображення кошика
+            function renderCart() {
+                const cartContainer = document.getElementById('cart-items');
+                const cartEmpty = document.getElementById('cart-empty');
+                const cartTotal = document.getElementById('cart-total');
+                const totalPrice = document.getElementById('total-price');
+                
+                if (!cartContainer || !cartEmpty || !cartTotal || !totalPrice) {
+                    console.error('Елементи кошика не знайдені');
+                    return;
+                }
+                
+                const cart = getCart();
+                
+                cartContainer.innerHTML = '';
+                
+                if (cart.length === 0) {
+                    cartEmpty.style.display = 'block';
+                    cartTotal.style.display = 'none';
+                    return;
+                }
+                
+                cartEmpty.style.display = 'none';
+                cartTotal.style.display = 'block';
+                
+                let total = 0;
+                
+                cart.forEach((item, index) => {
+                    const name = item.name || 'Товар';
+                    const price = Number(item.price) || 0;
+                    const quantity = Number(item.quantity) || 1;
+                    const image = item.image || 'https://via.placeholder.com/50?text=Товар';
+                    
+                    total += price * quantity;
+                    
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item';
+                    cartItem.innerHTML = `
+                        <div class="cart-item-image">
+                            <img src="${image}" alt="${name}" class="w-16 h-16 object-cover rounded mr-4">
+                        </div>
+                        <div class="cart-item-details">
+                            <h3 class="text-lg font-semibold">${name}</h3>
+                            <p class="text-gray-600">${price} грн.</p>
+                            <div class="quantity-controls">
+                                <button class="quantity-btn minus-btn" onclick="decreaseQuantity(${index})">-</button>
+                                <span class="item-quantity">${quantity}</span>
+                                <button class="quantity-btn plus-btn" onclick="increaseQuantity(${index})">+</button>
+                                <button class="remove-btn" onclick="removeItem(${index})">Видалити</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    cartContainer.appendChild(cartItem);
+                });
+                
+                totalPrice.textContent = total + ' грн.';
+            }
+            
+            // Функція оновлення лічильника
+            function updateCartCounter() {
+                console.log('updateCartCounter викликана');
+                const counter = document.getElementById('cart-counter');
+                const mobileCounter = document.getElementById('mobile-cart-counter');
+                
+                const cart = getCart();
+                let totalItems = 0;
+                
+                cart.forEach(item => {
+                    totalItems += Number(item.quantity) || 1;
+                });
+                
+                if (counter) counter.textContent = totalItems;
+                if (mobileCounter) mobileCounter.textContent = totalItems;
+            }
+            
+            // Функція оновлення кількості
+            window.increaseQuantity = function(index) {
+                const cart = getCart();
+                
+                if (cart[index]) {
+                    cart[index].quantity += 1;
+                    saveCart(cart);
+                    renderCart();
+                    updateCartCounter();
+                }
+            };
+            
+            // Функція оновлення кількості
+            window.decreaseQuantity = function(index) {
+                const cart = getCart();
+                
+                if (cart[index]) {
+                    if (cart[index].quantity <= 1) {
+                        removeItem(index);
+                    } else {
+                        cart[index].quantity -= 1;
+                        saveCart(cart);
+                        renderCart();
+                        updateCartCounter();
+                    }
+                }
+            };
+            
+            // Функція видалення товару
+            window.removeItem = function(index) {
+                const cart = getCart();
+                
+                if (cart[index]) {
+                    console.log('Видаляємо товар:', cart[index].name);
+                    cart.splice(index, 1);
+                    
+                    // Зберігаємо оновлений кошик в localStorage
+                    saveCart(cart);
+                    
+                    // Очищаємо всі інші можливі ключі кошика
+                    localStorage.removeItem('cart_data');
+                    localStorage.removeItem('maisterniasnu_cart_data');
+                    localStorage.removeItem('cartItems');
+                    
+                    // Перевірка збереження
+                    console.log('Кошик після видалення:', getCart());
+                    
+                    // Оновлюємо відображення кошика
+                    renderCart();
+                    updateCartCounter();
+                }
+            };
+            
+            // Обробник для кнопки очищення кошика
+            document.getElementById('clear-cart').addEventListener('click', function() {
+                console.log('Кнопка очистки кошика натиснута');
+                // Одразу очищаємо кошик без підтвердження
+                saveCart([]);
+                
+                // Видаляємо дані з усіх можливих ключів
+                localStorage.removeItem('cart_data');
+                localStorage.removeItem('maisterniasnu_cart_data');
+                localStorage.removeItem('cartItems');
+                
+                // Оновлюємо інтерфейс
+                renderCart();
+                updateCartCounter();
+            });
+            
+            // Обробка кнопки "Оформити замовлення"
+            document.getElementById('checkout').addEventListener('click', function() {
+                // Приховуємо кошик і відображаємо форму
+                document.getElementById('cart-items').style.display = 'none';
+                document.getElementById('cart-total').style.display = 'none';
+                document.getElementById('checkout-form').style.display = 'block';
+                
+                // Прокручуємо сторінку вгору
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+            
+            // Обробка кнопки "Повернутися до кошика"
+            document.getElementById('back-to-cart').addEventListener('click', function() {
+                // Приховуємо форму і відображаємо кошик
+                document.getElementById('checkout-form').style.display = 'none';
+                document.getElementById('cart-items').style.display = 'block';
+                document.getElementById('cart-total').style.display = 'block';
+            });
+            
+            // Обробка відправки форми замовлення
+            document.getElementById('order-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                // Отримуємо дані форми
+                const formData = new FormData(this);
+                const orderData = {};
+                
+                // Перетворюємо дані форми в об'єкт
+                for (const [key, value] of formData.entries()) {
+                    orderData[key] = value;
+                }
+                
+                // Додаємо до даних замовлення товари з кошика
+                orderData.items = getCart();
+                orderData.total_price = getTotalPrice();
+                orderData.order_time = new Date().toISOString();
+                orderData.order_number = generateOrderNumber();
+                
+                // Зберігаємо замовлення в localStorage (для демонстрації)
+                saveOrder(orderData);
+                
+                // Відображаємо номер замовлення
+                document.getElementById('order-number').textContent = orderData.order_number;
+                
+                // Приховуємо форму і відображаємо повідомлення про успіх
+                document.getElementById('checkout-form').style.display = 'none';
+                document.getElementById('order-success').style.display = 'block';
+                
+                // Очищаємо кошик
+                saveCart([]);
+                localStorage.removeItem('cart_data');
+                localStorage.removeItem('maisterniasnu_cart_data');
+                localStorage.removeItem('cartItems');
+                
+                // Оновлюємо лічильник кошика
+                updateCartCounter();
+                
+                console.log('Замовлення оформлено:', orderData);
+            });
+            
+            // Функція генерації номеру замовлення
+            function generateOrderNumber() {
+                const date = new Date();
+                const year = date.getFullYear().toString().substr(-2);
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const day = date.getDate().toString().padStart(2, '0');
+                
+                // Отримуємо тип доставки
+                const deliveryMethod = document.getElementById('delivery-method').value;
+                let deliveryCode = 'XX'; // Код за замовчуванням
+                
+                // Визначаємо код доставки
+                if (deliveryMethod === 'nova_poshta') {
+                    deliveryCode = 'NP';
+                } else if (deliveryMethod === 'ukr_poshta') {
+                    deliveryCode = 'UP';
+                }
+                
+                const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+                
+                return `${year}${month}${day}-${deliveryCode}-${random}`;
+            }
+            
+            // Функція збереження замовлення
+            function saveOrder(orderData) {
+                try {
+                    // Отримуємо існуючі замовлення або створюємо новий масив
+                    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+                    
+                    // Додаємо нове замовлення
+                    orders.push(orderData);
+                    
+                    // Зберігаємо оновлений список замовлень
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                    
+                    console.log('Замовлення збережено в localStorage');
+                } catch (e) {
+                    console.error('Помилка при збереженні замовлення:', e);
+                }
+            }
+            
+            // Функція розрахунку загальної вартості кошика
+            function getTotalPrice() {
+                const cart = getCart();
+                return cart.reduce((total, item) => {
+                    return total + (Number(item.price) || 0) * (Number(item.quantity) || 1);
+                }, 0);
+            }
+            
+            // Мобільне меню
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+            
+            // Додаємо повну синхронізацію даних кошика
+            function syncCartData() {
+                try {
+                    // Зберігаємо дані лише під ключем 'cart' і видаляємо старі ключі
+                    const cartData = getCart();
+                    
+                    // Видаляємо всі інші ключі
+                    localStorage.removeItem('cart_data');
+                    localStorage.removeItem('maisterniasnu_cart_data');
+                    localStorage.removeItem('cartItems');
+                    sessionStorage.removeItem('cart_data');
+                    sessionStorage.removeItem('cartItems');
+                    
+                    // Зберігаємо актуальні дані в єдиному ключі
+                    localStorage.setItem('cart', JSON.stringify(cartData));
+                    
+                    console.log('Дані кошика синхронізовано, кількість товарів:', cartData.length);
+                } catch (e) {
+                    console.error('Помилка при синхронізації даних кошика:', e);
+                }
+            }
+            
+            // Синхронізуємо дані кошика
+            syncCartData();
+            
+            // Відображаємо кошик
+            renderCart();
+            updateCartCounter();
+            
+            // Глобальна функція додавання товару для використання на інших сторінках
+            window.addToCart = function(product) {
+                console.log("Додаємо товар до кошика:", product);
+                
+                let cartData = [];
+                const cartJson = localStorage.getItem('cart');
+                
+                if (cartJson) {
+                    try {
+                        cartData = JSON.parse(cartJson);
+                        if (!Array.isArray(cartData)) {
+                            console.warn("Дані кошика пошкоджені, створюємо новий масив");
+                            cartData = [];
+                        }
+                    } catch (e) {
+                        console.error("Помилка при читанні даних кошика:", e);
+                        cartData = [];
+                    }
+                }
+                
+                console.log("Поточні дані кошика:", cartData);
+                
+                let productExists = false;
+                for (let i = 0; i < cartData.length; i++) {
+                    if (cartData[i].id === product.id) {
+                        cartData[i].quantity = (Number(cartData[i].quantity) || 0) + 1;
+                        productExists = true;
+                        break;
+                    }
+                }
+                
+                if (!productExists) {
+                    product.quantity = 1;
+                    cartData.push(product);
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cartData));
+                
+                if (window.updateCartCounter) {
+                    window.updateCartCounter();
+                }
+                
+                showNotification("Товар додано до кошика");
+                
+                return true;
+            };
+
+            // Обробник для поля телефону
+            document.getElementById('phone').addEventListener('input', function(e) {
+                // Видаляємо всі символи, крім цифр і +
+                let phoneNumber = e.target.value.replace(/[^\d+]/g, '');
+                
+                // Автоматично додаємо +380 якщо користувач почав ввод з 0
+                if (phoneNumber.startsWith('0') && phoneNumber.length > 1) {
+                    phoneNumber = '+38' + phoneNumber;
+                }
+                
+                // Обмежуємо довжину номера
+                if (phoneNumber.startsWith('+380')) {
+                    phoneNumber = phoneNumber.substr(0, 13); // +380 + 9 цифр
+                } else if (phoneNumber.startsWith('0')) {
+                    phoneNumber = phoneNumber.substr(0, 10); // 0 + 9 цифр
+                }
+                
+                // Оновлюємо значення поля
+                e.target.value = phoneNumber;
+            });
+
+            // Додаткова валідація перед відправкою форми
+            document.getElementById('order-form').addEventListener('submit', function(event) {
+                const phoneInput = document.getElementById('phone');
+                const phoneNumber = phoneInput.value;
+                
+                // Перевіряємо формат номера
+                const isValidPhoneNumber = /^(\+380\d{9}|0\d{9})$/.test(phoneNumber);
+                
+                if (!isValidPhoneNumber) {
+                    event.preventDefault();
+                    alert('Будь ласка, введіть коректний український номер телефону у форматі +380XXXXXXXXX або 0XXXXXXXXX');
+                    phoneInput.focus();
+                    return false;
+                }
+            });
+        });
+
+        function showNotification(message, isError = false) {
+            // Функція нічого не робить
+            console.log(message); // Залишаємо лог для відлагодження
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "maisternia-snu",
+  "version": "1.0.0",
+  "description": "Сайт Майстерня Сну",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "server": "nodemon server.js",
+    "client": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "dev": "concurrently \"npm run server\" \"npm run client\""
+  },
+  "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.18.2",
+    "express-session": "^1.17.3",
+    "nodemailer": "^6.9.7"
+  },
+  "devDependencies": {
+    "@schemastore/package": "^0.0.10",
+    "autoprefixer": "^10.4.16",
+    "concurrently": "^8.2.2",
+    "nodemon": "^3.0.1",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.4.10",
+    "vite": "^5.4.2"
+  }
+}
